@@ -1,0 +1,143 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <ctype.h>
+
+char board[3][3];
+const char PLAYER = 'X';
+const char COMPUTER = 'O';
+
+// Function declarations
+void ResetBoard();
+void DisplayBoard();
+void PlayerMove();
+void ComputerMove();
+int CheckFreeSpaces();
+char CheckWinner();
+void PrintWinner(char winner);
+
+void ResetBoard(){
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++){
+            board[i][j] = ' ';
+        }
+    }
+}
+
+void DisplayBoard(){
+    printf("Are You Ready to Play? \n");
+    printf(" %c | %c | %c ", board[0][0], board[0][1], board[0][2]);
+    printf("\n---|---|---\n");
+    printf(" %c | %c | %c ", board[1][0], board[1][1], board[1][2]);
+    printf("\n---|---|---\n");
+    printf(" %c | %c | %c ", board[2][0], board[2][1], board[2][2]);
+    printf("\n");
+}
+
+void PlayerMove(){
+    int x;
+    int y;
+
+    do{
+        printf("Enter a row #(1-3): ");
+        scanf("%d", &x);
+        x--;
+        printf("Enter a column #(1-3): ");
+        scanf("%d", &y);
+        y--;
+        
+        if (board[x][y] != ' '){
+            printf("Invalid move!\n");
+        }
+        else{
+            board[x][y] = PLAYER;
+            break;
+        }
+    } while(1);
+}
+
+void ComputerMove(){
+    srand(time(0));
+    int x;
+    int y;
+
+    if(CheckFreeSpaces() > 0){
+        do{
+            x = rand() % 3;
+            y = rand() % 3;
+        } while(board[x][y] != ' ');
+        board[x][y] = COMPUTER;
+    }
+    else{
+        PrintWinner(' ');
+    }
+}
+
+int CheckFreeSpaces(){
+    int freeSpaces = 9;
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < 3; j++){
+            if(board[i][j] != ' '){
+                freeSpaces--;
+            }
+        }
+    }
+    return freeSpaces;
+}
+char CheckWinner(){
+    for(int i = 0; i < 3; i++){
+        if(board[i][0] == board[i][1] && board[i][1] == board[i][2]){
+            return board[i][0];
+        }
+    }
+    
+    for(int i = 0; i < 3; i++){
+        if(board[0][i] == board[1][i] && board[1][i] == board[2][i]){
+            return board[0][i];
+        }
+    }
+    
+    if(board[0][0] == board[1][1] && board[1][1] == board[2][2]){
+        return board[0][0];
+    }
+    if(board[0][2] == board[1][1] && board[1][1] == board[2][0]){
+        return board[0][2];
+    }
+    return ' ';
+}
+
+void PrintWinner(char winner){
+    if(winner == PLAYER){
+        printf("You win!");
+    }
+    else if(winner == COMPUTER){
+        printf("You lose!");
+    }
+    else{
+        printf("It's a draw!");
+    }
+}
+
+int main()
+{
+    char winner = ' ';
+    ResetBoard();
+    while(winner == ' ' && CheckFreeSpaces() != 0)
+    {
+        DisplayBoard();
+        PlayerMove();
+        winner = CheckWinner();
+        if(winner != ' ' || CheckFreeSpaces() == 0){
+            break;
+        }
+        ComputerMove();
+        winner = CheckWinner();
+        if(winner != ' ' || CheckFreeSpaces() == 0){
+            break;
+        }
+    }
+
+    DisplayBoard();
+    PrintWinner(winner);
+    return 0;
+}
